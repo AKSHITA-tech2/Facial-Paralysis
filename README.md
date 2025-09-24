@@ -3,7 +3,7 @@
 A web-based AI application for detecting and analyzing facial paralysis through facial symmetry analysis.
 
 ## 🌐 Live Demo
-[Visit the live website](https://AKSHITA-tech2.github.io/Facial-Paralysis/)
+(https://AKSHITA-tech2.github.io/Facial-Paralysis/)
 
 ## ✨ Features
 - **Google Authentication** - Secure user login
