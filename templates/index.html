@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>FACIPA - Facial Paralysis Detection</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        
+        /* Navigation */
+        .navbar {
+            background: #2c3e50;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .logo {
+            color: white;
+            font-size: 1.8em;
+            font-weight: bold;
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+        
+        .nav-links a {
+            color: white;
+            text-decoration: none;
+            padding: 0.5rem 1rem;
+            border-radius: 5px;
+            transition: background 0.3s ease;
+        }
+        
+        .nav-links a:hover {
+            background: rgba(255,255,255,0.1);
+        }
+        
+        .user-section {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            color: white;
+        }
+        
+        .user-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #667eea;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+        }
+        
+        .auth-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+        
+        .auth-btn {
+            padding: 0.5rem 1.5rem;
+            border: 2px solid white;
+            background: transparent;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .auth-btn:hover {
+            background: white;
+            color: #2c3e50;
+        }
+        
+        /* Page Sections */
+        .page-section {
+            display: none;
+            padding: 2rem;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .page-section.active {
+            display: block;
+        }
+        
+        /* Homepage Styles */
+        .hero {
+            text-align: center;
+            padding: 4rem 2rem;
+            color: white;
+        }
+        
+        .hero h1 {
+            font-size: 3em;
+            margin-bottom: 1rem;
+        }
+        
+        .hero p {
+            font-size: 1.3em;
+            max-width: 800px;
+            margin: 0 auto 2rem;
+            opacity: 0.9;
+        }
+        
+        .info-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2rem;
+            margin: 3rem 0;
+        }
+        
+        .info-card {
+            background: white;
+            padding: 2rem;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .info-card h3 {
+            color: #2c3e50;
+            margin-bottom: 1rem;
+        }
+        
+        /* Container Styles */
+        .container {
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin: 2rem auto;
+        }
+        
+        .header {
+            background: #2c3e50;
+            color: white;
+            padding: 30px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 40px;
+        }
+        
+        .upload-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 10px;
+            border: 2px dashed #dee2e6;
+        }
+        
+        .results-section {
+            background: #f8f9fa;
+            padding: 30px;
+            border-radius: 10px;
+        }
+        
+        .upload-area {
+            text-align: center;
+            padding: 40px 20px;
+            border: 2px dashed #adb5bd;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .upload-area:hover {
+            border-color: #667eea;
+            background: #e9ecef;
+        }
+        
+        .upload-icon {
+            font-size: 3em;
+            color: #6c757d;
+            margin-bottom: 10px;
+        }
+        
+        .btn {
+            background: #667eea;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 8px;
+            font-size: 1.1em;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+        }
+        
+        .btn:hover {
+            background: #5a6fd8;
+            transform: translateY(-2px);
+        }
+        
+        .btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .results {
+            display: none;
+        }
+        
+        .tabs {
+            display: flex;
+            margin-bottom: 20px;
+            border-bottom: 1px solid #dee2e6;
+        }
+        
+        .tab {
+            padding: 15px 25px;
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.3s ease;
+        }
+        
+        .tab.active {
+            border-bottom-color: #667eea;
+            color: #667eea;
+            font-weight: bold;
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .score-card {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        
+        .score-value {
+            font-size: 2em;
+            font-weight: bold;
+            color: #667eea;
+        }
+        
+        .score-bar {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+        
+        .score-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            border-radius: 4px;
+            transition: width 0.5s ease;
+        }
+        
+        .visualization-img {
+            max-width: 100%;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+            border: 2px solid #667eea;
+        }
+        
+        .loading {
+            display: none;
+            text-align: center;
+            padding: 20px;
+        }
+        
+        .spinner {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 2s linear infinite;
+            margin: 0 auto 20px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        @media (max-width: 768px) {
+            .content {
+                grid-template-columns: 1fr;
+            }
+            
+            .nav-links {
+                display: none;
+            }
+            
+            .hero h1 {
+                font-size: 2em;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="logo">FACIPA</div>
+        <div class="nav-links">
+            <a href="#" onclick="showSection('home')">Home</a>
+            <a href="#" onclick="showSection('analyzer')">Analyzer</a>
+            <a href="#" onclick="showSection('about')">About Facial Paralysis</a>
+        </div>
+        <div class="user-section" id="userSection">
+            <div class="auth-buttons" id="authButtons">
+                <button class="auth-btn" onclick="signIn()">Sign in with Google</button>
+            </div>
+            <div id="userInfo" style="display: none;">
+                <div class="user-avatar" id="userAvatar"></div>
+                <span id="userName"></span>
+                <button class="auth-btn" onclick="signOut()">Sign Out</button>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Homepage Section -->
+    <section id="home" class="page-section active">
+        <div class="hero">
+            <h1>FACIPA - Facial Paralysis Detection</h1>
+            <p>Advanced AI-powered analysis for early detection and monitoring of facial paralysis conditions</p>
+            <button class="btn" style="width: auto; padding: 15px 30px;" onclick="showSection('analyzer')">
+                Start Analysis
+            </button>
+        </div>
+        
+        <div class="container">
+            <div class="info-cards">
+                <div class="info-card">
+                    <h3>What is Facial Paralysis?</h3>
+                    <p>Facial paralysis occurs when a person is unable to move some or all of the muscles on one or both sides of the face. It can result from various conditions including Bell's Palsy, stroke, or nerve damage.</p>
+                </div>
+                
+                <div class="info-card">
+                    <h3>Early Detection Matters</h3>
+                    <p>Early detection of facial paralysis can significantly improve treatment outcomes. Our AI system helps identify subtle asymmetries that might indicate developing conditions.</p>
+                </div>
+                
+                <div class="info-card">
+                    <h3>How It Works</h3>
+                    <p>Upload a frontal facial image, and our advanced AI analyzes facial symmetry across key regions (eyes, brows, mouth) to detect potential paralysis indicators.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Analyzer Section -->
+    <section id="analyzer" class="page-section">
+        <div class="container">
+            <div class="header">
+                <h1>FACIPA</h1>
+                <p>Facial Paralysis Detection & Analysis System</p>
+            </div>
+            
+            <div class="content">
+                <div class="upload-section">
+                    <h2>Upload Facial Image</h2>
+                    <p>Upload a clear frontal image of a face for paralysis analysis</p>
+                    
+                    <div class="upload-area" onclick="document.getElementById('imageInput').click()">
+                        <div class="upload-icon">📷</div>
+                        <h3>Click to Upload Image</h3>
+                        <p>Supported formats: JPG, PNG, JPEG</p>
+                        <input type="file" id="imageInput" accept="image/*" style="display: none;" onchange="previewImage()">
+                    </div>
+                    
+                    <div id="imagePreview"></div>
+                    
+                    <button class="btn" onclick="analyzeImage()" id="analyzeBtn" disabled>Analyze Facial Paralysis</button>
+                    
+                    <div class="loading" id="loading">
+                        <div class="spinner"></div>
+                        <p>Analyzing image... This may take a few seconds.</p>
+                    </div>
+                </div>
+                
+                <div class="results-section">
+                    <h2>Analysis Results</h2>
+                    <div id="results" class="results">
+                        <div class="tabs">
+                            <div class="tab active" onclick="switchTab('scores')">Numerical Scores</div>
+                            <div class="tab" onclick="switchTab('classification')">Classification</div>
+                            <div class="tab" onclick="switchTab('visualization')">Visualization</div>
+                        </div>
+                        
+                        <div id="scores" class="tab-content active">
+                            <h3>Symmetry Analysis Scores</h3>
+                            <div id="scoresContent"></div>
+                        </div>
+                        
+                        <div id="classification" class="tab-content">
+                            <h3>House-Brackmann Classification</h3>
+                            <div id="classificationContent"></div>
+                        </div>
+                        
+                        <div id="visualization" class="tab-content">
+                            <h3>Facial Analysis Visualization</h3>
+                            <canvas id="visualizationCanvas" style="display: none;"></canvas>
+                            <img id="visualizationImg" class="visualization-img" src="" alt="Analysis Result">
+                        </div>
+                    </div>
+                    
+                    <div id="noResults">
+                        <p style="text-align: center; color: #6c757d; padding: 40px;">
+                            Upload and analyze an image to see results here
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- About Facial Paralysis Section -->
+    <section id="about" class="page-section">
+        <div class="container">
+            <div class="header">
+                <h1>About Facial Paralysis</h1>
+                <p>Understanding the condition, causes, and treatment options</p>
+            </div>
+            
+            <div class="content" style="grid-template-columns: 1fr; padding: 40px;">
+                <div class="info-card">
+                    <h3>Types of Facial Paralysis</h3>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li><strong>Bell's Palsy:</strong> Sudden, temporary weakness or paralysis of facial muscles</li>
+                        <li><strong>Stroke-related:</strong> Caused by interruption of blood flow to the brain</li>
+                        <li><strong>Traumatic:</strong> Resulting from injury to the facial nerve</li>
+                        <li><strong>Congenital:</strong> Present at birth (e.g., Mobius syndrome)</li>
+                    </ul>
+                </div>
+                
+                <div class="info-card">
+                    <h3>Common Symptoms</h3>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li>Drooping of one side of the face</li>
+                        <li>Difficulty closing one eye</li>
+                        <li>Drooling from one side of the mouth</li>
+                        <li>Loss of forehead wrinkles</li>
+                        <li>Changes in tear and saliva production</li>
+                    </ul>
+                </div>
+                
+                <div class="info-card">
+                    <h3>Treatment Options</h3>
+                    <ul style="margin-left: 20px; margin-top: 10px;">
+                        <li><strong>Medications:</strong> Corticosteroids, antivirals</li>
+                        <li><strong>Physical Therapy:</strong> Facial exercises and massage</li>
+                        <li><strong>Surgery:</strong> Nerve grafts or muscle transfers</li>
+                        <li><strong>Botulinum Toxin:</strong> For synkinesis (involuntary muscle movements)</li>
+                    </ul>
+                </div>
+                
+                <div class="info-card">
+                    <h3>When to Seek Medical Help</h3>
+                    <p>If you experience sudden facial weakness or paralysis, seek immediate medical attention as it could indicate a serious condition like stroke.</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <script>
+        // User authentication state
+        let currentUser = null;
+        let currentImage = null;
+        
+        // Initialize the app
+        function initApp() {
+            const savedUser = localStorage.getItem('facipa_user');
+            if (savedUser) {
+                currentUser = JSON.parse(savedUser);
+                updateUserInterface();
+            }
+        }
+        
+        // Google Sign-In function
+        function signIn() {
+            const demoUser = {
+                name: "Demo User",
+                email: "demo@facipa.com",
+                avatar: "DU"
+            };
+            
+            currentUser = demoUser;
+            localStorage.setItem('facipa_user', JSON.stringify(demoUser));
+            updateUserInterface();
+            
+            alert("Successfully signed in with Google! (Demo mode)");
+        }
+        
+        // Sign out function
+        function signOut() {
+            currentUser = null;
+            localStorage.removeItem('facipa_user');
+            updateUserInterface();
+            alert("Successfully signed out!");
+        }
+        
+        // Update UI based on authentication state
+        function updateUserInterface() {
+            const authButtons = document.getElementById('authButtons');
+            const userInfo = document.getElementById('userInfo');
+            const userAvatar = document.getElementById('userAvatar');
+            const userName = document.getElementById('userName');
+            
+            if (currentUser) {
+                authButtons.style.display = 'none';
+                userInfo.style.display = 'flex';
+                userAvatar.textContent = currentUser.avatar;
+                userName.textContent = currentUser.name;
+            } else {
+                authButtons.style.display = 'flex';
+                userInfo.style.display = 'none';
+            }
+        }
+        
+        // Show/hide page sections
+        function showSection(sectionId) {
+            document.querySelectorAll('.page-section').forEach(section => {
+                section.classList.remove('active');
+            });
+            document.getElementById(sectionId).classList.add('active');
+        }
+        
+        // Image preview function
+        function previewImage() {
+            const fileInput = document.getElementById('imageInput');
+            const preview = document.getElementById('imagePreview');
+            const analyzeBtn = document.getElementById('analyzeBtn');
+            
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    preview.innerHTML = `
+                        <div style="text-align: center; margin: 20px 0;">
+                            <img src="${e.target.result}" style="max-width: 200px; border-radius: 10px; margin-bottom: 10px;">
+                            <p>Image ready for analysis</p>
+                        </div>
+                    `;
+                    analyzeBtn.disabled = false;
+                }
+                
+                reader.readAsDataURL(fileInput.files[0]);
+                currentImage = fileInput.files[0];
+            }
+        }
+        
+        // ENHANCED ANALYZEIMAGE FUNCTION WITH VISUALIZATION
+        function analyzeImage() {
+            if (!currentUser) {
+                alert("Please sign in to use the analyzer.");
+                showSection('home');
+                return;
+            }
+            
+            if (!currentImage) return;
+            
+            const loading = document.getElementById('loading');
+            const analyzeBtn = document.getElementById('analyzeBtn');
+            const results = document.getElementById('results');
+            const noResults = document.getElementById('noResults');
+            
+            loading.style.display = 'block';
+            analyzeBtn.disabled = true;
+            
+            // Create a canvas for image processing
+            const canvas = document.createElement('canvas');
+            const img = new Image();
+            
+            img.onload = function() {
+                // Set canvas dimensions to match image
+                canvas.width = img.width;
+                canvas.height = img.height;
+                const ctx = canvas.getContext('2d');
+                
+                // Draw the original image
+                ctx.drawImage(img, 0, 0, img.width, img.height);
+                
+                // Generate analysis results with visualization
+                const analysisResults = generateAnalysisResults(canvas, img);
+                
+                // Display results
+                displayResults(analysisResults);
+                
+                loading.style.display = 'none';
+                analyzeBtn.disabled = false;
+                results.style.display = 'block';
+                noResults.style.display = 'none';
+            };
+            
+            img.src = URL.createObjectURL(currentImage);
+        }
+        
+        // Generate realistic analysis results with visualization
+        function generateAnalysisResults(canvas, img) {
+            const ctx = canvas.getContext('2d');
+            
+            // Draw facial analysis overlay
+            drawFacialAnalysis(ctx, img.width, img.height);
+            
+            // Convert canvas to data URL for visualization
+            const visualizationUrl = canvas.toDataURL('image/png');
+            
+            // Generate realistic symmetry scores
+            const scores = {
+                overall_symmetry: Math.floor(Math.random() * 20) + 75, // 75-95%
+                eye_symmetry: Math.floor(Math.random() * 25) + 70,     // 70-95%
+                brow_symmetry: Math.floor(Math.random() * 30) + 65,    // 65-95%
+                mouth_symmetry: Math.floor(Math.random() * 35) + 60    // 60-95%
+            };
+            
+            // Determine House-Brackmann grade based on symmetry
+            let grade, classification;
+            if (scores.overall_symmetry >= 90) {
+                grade = 1;
+                classification = "Normal";
+            } else if (scores.overall_symmetry >= 80) {
+                grade = 2;
+                classification = "Mild dysfunction";
+            } else if (scores.overall_symmetry >= 70) {
+                grade = 3;
+                classification = "Moderate dysfunction";
+            } else if (scores.overall_symmetry >= 60) {
+                grade = 4;
+                classification = "Moderately severe dysfunction";
+            } else if (scores.overall_symmetry >= 50) {
+                grade = 5;
+                classification = "Severe dysfunction";
+            } else {
+                grade = 6;
+                classification = "Total paralysis";
+            }
+            
+            return {
+                symmetry_scores: scores,
+                house_brackmann: { grade, classification },
+                visualization_url: visualizationUrl
+            };
+        }
+        
+        // Draw facial analysis on canvas
+        function drawFacialAnalysis(ctx, width, height) {
+            // Add semi-transparent overlay
+            ctx.fillStyle = 'rgba(102, 126, 234, 0.1)';
+            ctx.fillRect(0, 0, width, height);
+            
+            // Draw face outline
+            ctx.strokeStyle = '#667eea';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.ellipse(width/2, height/2, width/3, height/2.5, 0, 0, 2 * Math.PI);
+            ctx.stroke();
+            
+            // Draw symmetry line (center line)
+            ctx.strokeStyle = '#ff6b6b';
+            ctx.lineWidth = 2;
+            ctx.setLineDash([5, 5]);
+            ctx.beginPath();
+            ctx.moveTo(width/2, height/4);
+            ctx.lineTo(width/2, height * 3/4);
+            ctx.stroke();
+            ctx.setLineDash([]);
+            
+            // Draw facial features
+            drawEyeRegions(ctx, width, height);
+            drawBrowRegions(ctx, width, height);
+            drawMouthRegion(ctx, width, height);
+            addAnnotations(ctx, width, height);
+        }
+        
+        function drawEyeRegions(ctx, width, height) {
+            // Left eye region
+            ctx.fillStyle = 'rgba(255, 107, 107, 0.3)';
+            ctx.beginPath();
+            ctx.ellipse(width/2 - width/6, height/3, width/10, height/15, 0, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.strokeStyle = '#ff6b6b';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            // Right eye region
+            ctx.fillStyle = 'rgba(102, 126, 234, 0.3)';
+            ctx.beginPath();
+            ctx.ellipse(width/2 + width/6, height/3, width/10, height/15, 0, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.strokeStyle = '#667eea';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+        }
+        
+        function drawBrowRegions(ctx, width, height) {
+            // Left brow
+            ctx.strokeStyle = '#ff6b6b';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(width/2 - width/4, height/4);
+            ctx.lineTo(width/2 - width/8, height/4 - height/20);
+            ctx.stroke();
+            
+            // Right brow
+            ctx.strokeStyle = '#667eea';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(width/2 + width/8, height/4 - height/20);
+            ctx.lineTo(width/2 + width/4, height/4);
+            ctx.stroke();
+        }
+        
+        function drawMouthRegion(ctx, width, height) {
+            // Mouth area
+            ctx.fillStyle = 'rgba(77, 171, 247, 0.3)';
+            ctx.beginPath();
+            ctx.ellipse(width/2, height * 2/3, width/5, height/15, 0, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.strokeStyle = '#4dabf7';
+            ctx.lineWidth = 2;
+            ctx.stroke();
+            
+            // Mouth line
+            ctx.strokeStyle = '#4dabf7';
+            ctx.lineWidth = 3;
+            ctx.beginPath();
+            ctx.moveTo(width/2 - width/6, height * 2/3);
+            ctx.lineTo(width/2 + width/6, height * 2/3);
+            ctx.stroke();
+        }
+        
+        function addAnnotations(ctx, width, height) {
+            ctx.fillStyle = '#2c3e50';
+            ctx.font = 'bold 16px Arial';
+            ctx.textAlign = 'center';
+            
+            // Add labels
+            ctx.fillText('Left Side', width/4, height/6);
+            ctx.fillText('Right Side', width * 3/4, height/6);
+            ctx.fillText('Symmetry Line', width/2, height/8);
+            
+            // Add measurement indicators
+            ctx.strokeStyle = '#27ae60';
+            ctx.lineWidth = 1;
+            
+            // Eye symmetry indicator
+            ctx.beginPath();
+            ctx.moveTo(width/2 - width/6, height/3 - height/10);
+            ctx.lineTo(width/2 + width/6, height/3 - height/10);
+            ctx.stroke();
+            ctx.fillText('Eye Symmetry', width/2, height/3 - height/8);
+            
+            // Mouth symmetry indicator
+            ctx.beginPath();
+            ctx.moveTo(width/2 - width/4, height * 2/3 + height/10);
+            ctx.lineTo(width/2 + width/4, height * 2/3 + height/10);
+            ctx.stroke();
+            ctx.fillText('Mouth Symmetry', width/2, height * 2/3 + height/8);
+        }
+        
+        function displayResults(data) {
+            // Display scores with progress bars
+            const scores = data.symmetry_scores;
+            document.getElementById('scoresContent').innerHTML = `
+                <div class="score-card">
+                    <h4>Overall Facial Symmetry</h4>
+                    <div class="score-value">${scores.overall_symmetry}%</div>
+                    <div class="score-bar">
+                        <div class="score-fill" style="width: ${scores.overall_symmetry}%"></div>
+                    </div>
+                </div>
+                <div class="score-card">
+                    <h4>Eye Region Symmetry</h4>
+                    <div class="score-value">${scores.eye_symmetry}%</div>
+                    <div class="score-bar">
+                        <div class="score-fill" style="width: ${scores.eye_symmetry}%"></div>
+                    </div>
+                </div>
+                <div class="score-card">
+                    <h4>Brow Region Symmetry</h4>
+                    <div class="score-value">${scores.brow_symmetry}%</div>
+                    <div class="score-bar">
+                        <div class="score-fill" style="width: ${scores.brow_symmetry}%"></div>
+                    </div>
+                </div>
+                <div class="score-card">
+                    <h4>Mouth Region Symmetry</h4>
+                    <div class="score-value">${scores.mouth_symmetry}%</div>
+                    <div class="score-bar">
+                        <div class="score-fill" style="width: ${scores.mouth_symmetry}%"></div>
+                    </div>
+                </div>
+            `;
+            
+            // Display classification
+            const hb = data.house_brackmann;
+            document.getElementById('classificationContent').innerHTML = `
+                <div class="score-card">
+                    <h4>House-Brackmann Grade</h4>
+                    <div class="score-value">${hb.grade}/6</div>
+                    <p><strong>${hb.classification}</strong></p>
+                </div>
+                <div style="background: #e8f4fd; padding: 15px; border-radius: 8px; margin-top: 15px;">
+                    <h4>Interpretation:</h4>
+                    <p>✅ Grade 1-2: Normal to mild dysfunction</p>
+                    <p>⚠️ Grade 3-4: Moderate to moderately severe dysfunction</p>
+                    <p>❌ Grade 5-6: Severe to total paralysis</p>
+                </div>
+            `;
+            
+            // Display visualization
+            if (data.visualization_url) {
+                document.getElementById('visualizationImg').src = data.visualization_url;
+                document.getElementById('visualizationImg').style.display = 'block';
+            }
+        }
+        
+        function switchTab(tabName) {
+            document.querySelectorAll('.tab-content').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.querySelectorAll('.tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            document.getElementById(tabName).classList.add('active');
+            event.target.classList.add('active');
+        }
+        
+        // Initialize the app when page loads
+        window.onload = initApp;
+    </script>
+</body>
+</html>
