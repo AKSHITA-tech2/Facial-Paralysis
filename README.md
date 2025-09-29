@@ -22,16 +22,11 @@ A sophisticated web-based application for early detection and analysis of facial
 - **Progress Tracking** - Monitor changes over time
 - **Educational Resources** - Comprehensive information about facial paralysis
 
-## 🚀 Live Demo
-
-**Experience the application live:**  
-[🌐 https://AKSHITA-tech2.github.io/Facial-Paralysis/](https://AKSHITA-tech2.github.io/Facial-Paralysis/)
-
 ## 📸 Screenshots
 
-| Analysis Interface | Results Dashboard | Visualization |
-|-------------------|------------------|---------------|
-| ![Upload](https://via.placeholder.com/250x150/667eea/ffffff?text=Image+Upload) | ![Results](https://via.placeholder.com/250x150/764ba2/ffffff?text=AI+Analysis) | ![Viz](https://via.placeholder.com/250x150/4dabf7/ffffff?text=Visualization) |
+<img width="1559" height="869" alt="image" src="https://github.com/user-attachments/assets/ee0eafe1-cbd4-4e32-b87e-db6738831a6e" />
+
+
 
 ## 🛠️ Technology Stack
 
